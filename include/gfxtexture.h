@@ -12,7 +12,13 @@ public:
 
     bool init(int w, int h);
     bool load_image(const char* filename); // requiere SDL_image
+
     void fill(u8 r, u8 g, u8 b);
+    void fill_checkerboard(u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2, int block_size);
+    void fill_checkerboard_colors(u32 c1, u32 c2, int block_size);
+
+
+
     void render(SDL_Surface* dst);
 
     void set_position(int x, int y);

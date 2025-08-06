@@ -14,7 +14,8 @@ int main(int argc, char* argv[]) {
     GfxTexture tex;
     tex.init(50, 50);
     tex.set_position(20, 20);
-    tex.fill(255, 0, 0); // rojo
+    //tex.fill(255, 0, 0); // rojo
+    tex.fill_checkerboard(255,255,255, 22,22, 22, 5);
 
     while (1) {
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); // limpiar pantalla
