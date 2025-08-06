@@ -1,6 +1,8 @@
 #include <SDL/SDL.h>
 #include "gfxtexture.h"
 
+/*motor de videojuegos multiplataformas*/
+
 const int SCREEN_W = 320;
 const int SCREEN_H = 240;
 
