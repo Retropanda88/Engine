@@ -43,6 +43,7 @@ void GfxTexture::fill(u8 r, u8 g, u8 b) {
 
 void GfxTexture::render(SDL_Surface* dst) {
     if (!surface || !dst) return;
+    SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
     SDL_Rect pos = { x, y, 0, 0 };
     SDL_BlitSurface(surface, NULL, dst, &pos);
 }
@@ -53,7 +54,7 @@ void GfxTexture::set_position(int x, int y) {
 }
 
 void GfxTexture::set_alpha(u8 alpha) {
-    if (surface) SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
+    if (surface) this->alpha = alpha;
 }
 
 void GfxTexture::fill_checkerboard(u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2, int block_size) {

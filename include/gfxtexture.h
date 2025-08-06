@@ -27,6 +27,9 @@ public:
 private:
     SDL_Surface* surface;
     int x, y;
+    int w;
+    int h;
+    u8 alpha;
 };
 
 #endif

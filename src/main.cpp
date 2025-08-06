@@ -17,9 +17,10 @@ int main(int argc, char* argv[]) {
     //tex.fill(255, 0, 0); // rojo
     tex.fill_checkerboard(255,255,255, 22,22, 22, 5);
 
+    tex.set_alpha(10);
+
     while (1) {
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0)); // limpiar pantalla
-
         tex.render(screen);
         SDL_Flip(screen);
         SDL_Delay(16);
