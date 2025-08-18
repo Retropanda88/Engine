@@ -13,7 +13,7 @@
 #include <SDL/SDL.h>
 #include <types.h>
 #include <video.h>
-
+#include <font.h>
 
 //vram 
 SDL_Surface *vram = NULL;
@@ -49,6 +49,7 @@ int Init_Sistem(const char *msg){
 	}
 
 	printf("\n%s\n",msg);
+	fontsize(8, 8);
 
 	return 0;
 
