@@ -6,122 +6,144 @@
 #include <sfx.h>
 #include <surface_Tools.h>
 #include <sheet_bmp.h>
+#include <log.h>
 
-// Direcciones para animar sprite (se reservan aunque no uses todas aún)
-enum { UP, DOWN, LEFT, RIGHT, MAX_SPRITES };
+// Direcciones para animar sprite
+enum
+{ UP, DOWN, LEFT, RIGHT, MAX_SPRITES };
 
-// Resolución base de tu motor
-const int SCREEN_WIDTH  = 320;
-const int SCREEN_HEIGHT = 240;
+// Resolución base del motor
+constexpr int SCREEN_WIDTH = 320;
+constexpr int SCREEN_HEIGHT = 240;
 
 // Recursos globales
-Sprite* sheet = nullptr;
-Sprite* spr[MAX_SPRITES] = { nullptr };
+Sprite *sheet = nullptr;
+Sprite *spr[MAX_SPRITES] = { nullptr };
+
 gfxFont font;
 GfxTexture work_texture;
-SDL_Surface* p = nullptr;
-sfxMusic music;
+SDL_Surface *p = nullptr;
+mp3Music music;
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    // Inicializa el sistema
-    if (Init_Sistem("Engine v1.0") != 0) {
-        fprintf(stderr, "Error: al iniciar el sistema\n");
-        return EXIT_FAILURE;
-    }
+	// Inicializa sistema
+	if (Init_Sistem("Engine v1.0") != 0)
+	{
+		fprintf(stderr, "Error: al iniciar el sistema\n");
+		return EXIT_FAILURE;
+	}
 
-    // Inicializa el video
-    if (Set_Video(SCREEN_WIDTH, SCREEN_HEIGHT) != 0) {
-        fprintf(stderr, "Error: al iniciar el video\n");
-        return EXIT_FAILURE;
-    }
-    
-    sfx_init();
-    sfx_setmusicvolume(100);
-    sfx_setsoundvolume(80);
+	// Inicializa video
+	if (Set_Video(SCREEN_WIDTH, SCREEN_HEIGHT) != 0)
+	{
+		fprintf(stderr, "Error: al iniciar el video\n");
+		return EXIT_FAILURE;
+	}
 
-    // Inicializa tipografía
-    font.init();
+	Init_Log();
 
-    // Superficie temporal para texto
-    p = create_surface(80, 20, 32);
-    if (!p) {
-        fprintf(stderr, "Error: no se pudo crear la superficie\n");
-        return EXIT_FAILURE;
-    }
+	// Audio
+	Audio_SetMusicVolume(100);
+	Audio_SetSfxVolume(80);
 
-    // Escribe texto en la superficie
-    font.draw(p, MMX_FONT, 0, 0, "Hello Engine");
+	// Tipografía
+	font.init();
 
-    // Sprite desde datos embebidos
-    sheet = new Sprite((u8*)sheet_data, sheet_size, 1, 1);
-    sheet->setTransparency(255, 0, 255);
+	// Superficie temporal para texto
+	p = create_surface(160, 20, 32);
+	if (!p)
+	{
+		fprintf(stderr, "Error: no se pudo crear la superficie\n");
+		return EXIT_FAILURE;
+	}
+	font.draw(p, MMX_FONT, 0, 0, "Hello Engine mp3 music");
 
-    // Configuración de textura de trabajo
-    work_texture.init(p->w, p->h);
-    work_texture.fill(0, 0, 0);
-    work_texture.set_position(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    work_texture.set_surface(p, 0, 12);
-    work_texture.set_scale(0.5f);
-    work_texture.set_rotation(20.0f);
+	// Sprite desde datos embebidos
+	sheet = new Sprite((u8 *) sheet_data, sheet_size, 1, 1);
+	sheet->setTransparency(255, 0, 255);
 
-    // Variables de animación
-    float rotation = 0.0f;
-    float rotation_step = 0.6f;
-    float scale = 1.0f;
-    float scale_step = 0.03f;
-    
-    music.load("data/music2.wav");
-    music. play(true,true);
+	// Configuración de textura de trabajo
+	work_texture.load_from_surface(p);
+	work_texture.set_position(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	work_texture.set_scale(0.5f);
+	work_texture.set_rotation(20.0f);
 
-    // Loop principal
-    bool running = true;
-    while (running)
-    {
-        // Eventos (ejemplo: salir con ESC o cerrar ventana)
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) running = false;
-            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-                running = false;
-        }
+	// Variables de animación
+	float rotation = 0.0f, rotation_step = 0.6f;
+	float scale = 1.0f, scale_step = 0.03f;
+	char alpha = 0, alpha_step = 1;
 
-        // Limpia pantalla
-        SDL_FillRect(vram, nullptr, 0x00000000);
+	Write_Log("[INFO] Loading MP3 music...");
+	Write_Log("[INFO] Rotation animation enabled");
+	Write_Log("[INFO] Scale animation enabled");
+	Write_Log("[INFO] Alpha blending enabled");;
+	
+	music.load("data/music.mp3");
+	music.play(true);
 
-        // Actualiza animación
-        work_texture.set_rotation(rotation);
-        work_texture.set_scale(scale);
-        work_texture.rotozoom();
+	// Loop principal
+	bool running = true;
+	while (running)
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT)
+				running = false;
+			if (event.type == SDL_KEYDOWN)
+				if(event.key.keysym.sym == SDLK_a){
+					music.fadeout(800);
+				}
+				if(event.key.keysym.sym == SDLK_b && !music.isPlaying()){
+					music.play(true);
+				}
+		}
 
-        // Dibuja objetos
-        //sheet->draw(vram, 0, 0);
-        work_texture.render(vram);
+		// Limpia pantalla
+		SDL_FillRect(vram, nullptr, 0x00000000);
 
-        // Renderiza al frame buffer
-        Render();
+		// Actualiza animación
+		work_texture.set_rotation(rotation);
+		work_texture.set_scale(scale);
+		work_texture.set_alpha(alpha);
+		work_texture.rotozoom();
 
-        // Actualiza variables
-        rotation += rotation_step;
-        scale += scale_step;
+		// Renderiza
+		work_texture.render(vram);
+		print_log();
+		Render();
 
-        // Rebotes en límites
-        if (scale < 0.5f) scale_step = 0.03f;
-        if (scale > 9.0f) scale_step = -0.03f;
-        if (rotation > 360.0f) rotation_step = -0.6f;
-        if (rotation < 0.0f)   rotation_step = 0.6f;
+		// Actualiza variables
+		rotation += rotation_step;
+		scale += scale_step;
+		alpha += alpha_step;
 
-        // Control de FPS
-        Fps_sincronizar(20); // más fluido que 10
-    }
+		// Rebotes en límites
+		if (scale < 0.5f)
+			scale_step = 0.03f;
+		if (scale > 9.0f)
+			scale_step = -0.03f;
+		if (rotation > 360.0f)
+			rotation_step = -0.6f;
+		if (rotation < 0.0f)
+			rotation_step = 0.6f;
+		if (alpha < 1)
+			alpha_step = 1;
+		if (alpha > 254)
+			alpha_step = -1;
 
-    // Limpieza
-    delete sheet;
-    if (p) SDL_FreeSurface(p);
+		// Control de FPS
+		Fps_sincronizar(20);
+		update_log_scroll();
+	}
 
-    off_video();
-    shoutdown_sistem();
-    sfx_close();
+	// Limpieza
+	delete sheet;
+	if (p)
+		SDL_FreeSurface(p);
+	off_video();
+	Audio_Shutdown();
 
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
