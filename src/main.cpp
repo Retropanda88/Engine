@@ -7,6 +7,7 @@
 #include <surface_Tools.h>
 #include <sheet_bmp.h>
 #include <log.h>
+#include <mp3_sound.h>
 
 // Direcciones para animar sprite
 enum
