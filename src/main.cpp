@@ -78,9 +78,10 @@ int main(int argc, char **argv)
 	Write_Log("[INFO] Loading MP3 music...");
 	Write_Log("[INFO] Rotation animation enabled");
 	Write_Log("[INFO] Scale animation enabled");
-	Write_Log("[INFO] Alpha blending enabled");;
+	Write_Log("[INFO] Alpha blending enabled");
+	Write_Log("[INFO] data/music2.mp3");;
 	
-	music.load("data/music.mp3");
+	music.load("data/music2.mp3");
 	music.play(true);
 
 	// Loop principal
